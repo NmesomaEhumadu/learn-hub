@@ -7,28 +7,37 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes - in production, integrate with Lovable Cloud
-    toast.success("Login successful!");
-    navigate("/dashboard");
+    const success = await login(loginData.email, loginData.password);
+    if (success) {
+      const isAdmin = loginData.email.toLowerCase() === "admin@learnhub.com" || loginData.email.toLowerCase() === "admin";
+      toast.success(isAdmin ? "Admin login successful!" : "Login successful!");
+      navigate(isAdmin ? "/admin" : "/dashboard");
+    } else {
+      toast.error("Invalid credentials");
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (signupData.password !== signupData.confirmPassword) {
       toast.error("Passwords don't match!");
       return;
     }
-    // For demo purposes - in production, integrate with Lovable Cloud
-    toast.success("Account created successfully!");
-    navigate("/dashboard");
+    const success = await login(signupData.email, signupData.password);
+    if (success) {
+      toast.success("Account created successfully!");
+      navigate("/dashboard");
+    }
   };
 
   return (

@@ -47,8 +47,8 @@ const Navigation = () => {
             <Link to="/login">
               <Button variant="ghost" className="hover:glow transition-all duration-300">Login</Button>
             </Link>
-            <Link to="/login">
-              <Button className="glow hover:glow-strong transition-all duration-300">Get Started</Button>
+            <Link to="/join">
+              <Button className="glow hover:glow-strong transition-all duration-300">Join for Free</Button>
             </Link>
           </div>
 
@@ -81,8 +81,8 @@ const Navigation = () => {
                 <Link to="/login" onClick={() => setIsOpen(false)}>
                   <Button variant="ghost" className="w-full">Login</Button>
                 </Link>
-                <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full">Get Started</Button>
+                <Link to="/join" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full">Join for Free</Button>
                 </Link>
               </div>
             </div>

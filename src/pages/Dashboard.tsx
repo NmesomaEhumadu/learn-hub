@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -5,9 +6,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Award, Clock, TrendingUp, Settings, LogOut } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { BookOpen, Award, Clock, TrendingUp, Settings, LogOut, Edit } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Dashboard = () => {
+  const { user, logout, updateProfile } = useAuth();
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    avatar: user?.avatar || "",
+  });
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const enrolledCourses = [
     {
       id: 1,
@@ -59,11 +80,9 @@ const Dashboard = () => {
               <Button variant="secondary" size="icon">
                 <Settings className="h-5 w-5" />
               </Button>
-              <Link to="/">
-                <Button variant="secondary" size="icon">
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </Link>
+              <Button variant="secondary" size="icon" onClick={logout}>
+                <LogOut className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         </div>
@@ -134,20 +153,130 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="flex items-center gap-4 mb-4">
                     <img
-                      src="https://api.dicebear.com/7.x/avataaars/svg?seed=Student"
+                      src={user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Student"}
                       alt="Profile"
-                      className="h-20 w-20 rounded-full bg-muted"
+                      className="h-20 w-20 rounded-full bg-muted object-cover border-2 border-border"
                     />
                     <div>
-                      <h3 className="font-bold text-lg">John Doe</h3>
-                      <p className="text-sm text-muted-foreground">john.doe@email.com</p>
+                      <h3 className="font-bold text-lg">{user?.name || "Student"}</h3>
+                      <p className="text-sm text-muted-foreground">{user?.email || "user@example.com"}</p>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      setProfileData({
+                        name: user?.name || "",
+                        email: user?.email || "",
+                        avatar: user?.avatar || "",
+                      });
+                      setAvatarPreview(null);
+                      setShowEditDialog(true);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
                     Edit Profile
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Edit Profile Dialog */}
+              <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                <DialogContent className="glass neon-border">
+                  <DialogHeader>
+                    <DialogTitle className="text-glow">Edit Profile</DialogTitle>
+                    <DialogDescription>
+                      Update your profile information
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    {/* Profile Picture Upload */}
+                    <div className="space-y-2">
+                      <Label>Profile Picture</Label>
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <img
+                            src={avatarPreview || profileData.avatar || user?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Student"}
+                            alt="Profile"
+                            className="h-20 w-20 rounded-full bg-muted object-cover border-2 border-border"
+                          />
+                          <label
+                            htmlFor="avatar-upload"
+                            className="absolute bottom-0 right-0 h-6 w-6 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
+                          >
+                            <Edit className="h-3 w-3 text-primary-foreground" />
+                          </label>
+                          <input
+                            id="avatar-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 5 * 1024 * 1024) {
+                                  toast.error("Image size must be less than 5MB");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  const result = reader.result as string;
+                                  setAvatarPreview(result);
+                                  setProfileData({ ...profileData, avatar: result });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-muted-foreground">
+                            Click the icon to upload a new profile picture
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Max size: 5MB. Supported formats: JPG, PNG, GIF
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={profileData.name}
+                        onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                        placeholder="Your name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={profileData.email}
+                        onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        updateProfile(profileData);
+                        setShowEditDialog(false);
+                        toast.success("Profile updated successfully!");
+                      }}
+                      className="glow"
+                    >
+                      Save Changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
 
               {/* Achievements */}
               <Card className="glass neon-border hover:glow transition-all duration-500 animate-fade-up-delay-1">

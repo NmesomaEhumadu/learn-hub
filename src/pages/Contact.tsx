@@ -44,6 +44,46 @@ const Contact = () => {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-glow">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {[
+                {
+                  question: "How do I enroll in a course?",
+                  answer: "Simply browse our course catalog, select a course that interests you, and click 'Enroll Now'. You can pay securely and start learning immediately."
+                },
+                {
+                  question: "Do I get a certificate?",
+                  answer: "Yes! Upon completing a course, you'll receive a certificate of completion that you can share on LinkedIn and add to your resume."
+                },
+                {
+                  question: "Can I access courses on mobile?",
+                  answer: "Absolutely! LearnHub is fully responsive and works seamlessly on desktop, tablet, and mobile devices. Learn anywhere, anytime."
+                },
+                {
+                  question: "What if I'm not satisfied?",
+                  answer: "We offer a 30-day money-back guarantee. If you're not satisfied with your course, contact us within 30 days for a full refund."
+                },
+                {
+                  question: "How long do I have access to courses?",
+                  answer: "You have lifetime access to all courses you enroll in. Learn at your own pace and revisit materials whenever you need."
+                }
+              ].map((faq, index) => (
+                <Card key={index} className="glass neon-border">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2 text-glow">{faq.question}</h3>
+                    <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -165,7 +205,7 @@ const Contact = () => {
               </Card>
 
               {/* Map */}
-              <Card className="mt-6">
+              <Card className="mt-6 glass neon-border">
                 <CardContent className="p-0">
                   <div className="aspect-video bg-muted rounded-lg overflow-hidden">
                     <iframe
@@ -181,6 +221,35 @@ const Contact = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Support Hours Section */}
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Card className="glass neon-border">
+              <CardHeader>
+                <CardTitle className="text-glow text-center">Support Hours</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-3">Customer Support</h3>
+                    <p className="text-sm text-muted-foreground mb-2">Monday - Friday: 9:00 AM - 6:00 PM PST</p>
+                    <p className="text-sm text-muted-foreground mb-2">Saturday: 10:00 AM - 4:00 PM PST</p>
+                    <p className="text-sm text-muted-foreground">Sunday: Closed</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-3">Technical Support</h3>
+                    <p className="text-sm text-muted-foreground mb-2">Available 24/7 via email</p>
+                    <p className="text-sm text-muted-foreground mb-2">Response time: Within 24 hours</p>
+                    <p className="text-sm text-muted-foreground">Emergency support: Available for enrolled students</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

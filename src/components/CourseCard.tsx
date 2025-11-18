@@ -65,10 +65,14 @@ const CourseCard = ({
       </CardContent>
       <CardFooter className="flex items-center justify-between">
         <div>
-          <span className="text-2xl font-bold text-primary text-glow">${price}</span>
+          <span className="text-2xl font-bold text-primary text-glow">
+            {price === 0 ? "FREE" : `$${price}`}
+          </span>
         </div>
         <Link to={`/courses/${id}`}>
-          <Button className="glow hover:glow-strong transition-all duration-300">View Course</Button>
+          <Button className="glow hover:glow-strong transition-all duration-300">
+            {price === 0 ? "Start Free" : "View Course"}
+          </Button>
         </Link>
       </CardFooter>
     </Card>

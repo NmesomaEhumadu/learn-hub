@@ -1,5 +1,105 @@
 export const courses = [
   {
+    id: 0,
+    title: "Introduction to Web Development - FREE",
+    description: "Start your coding journey with this free introductory course. Learn HTML, CSS, and JavaScript basics to build your first website!",
+    category: "Web Development",
+    price: 0,
+    duration: "8 hours",
+    students: 45230,
+    rating: 4.9,
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
+    instructor: "Sarah Johnson",
+    fullDescription: "This FREE course is perfect for absolute beginners who want to start their web development journey. You'll learn the fundamentals of HTML, CSS, and JavaScript by building real projects. No prior experience needed!",
+    isFree: true,
+    whatYouWillLearn: [
+      "HTML5 structure and semantic elements",
+      "CSS styling and layout techniques",
+      "JavaScript basics and DOM manipulation",
+      "Building your first responsive website",
+      "Best practices for clean code",
+      "Introduction to modern web development tools"
+    ],
+    requirements: [
+      "No prior experience required",
+      "A computer with internet connection",
+      "A text editor (we'll show you free options)",
+      "Enthusiasm to learn!"
+    ],
+    curriculum: [
+      { module: "Getting Started with HTML", lessons: 4 },
+      { module: "Styling with CSS", lessons: 5 },
+      { module: "JavaScript Fundamentals", lessons: 6 },
+      { module: "Building Your First Project", lessons: 3 }
+    ],
+    lessons: [
+      {
+        id: 1,
+        title: "Welcome to Web Development",
+        type: "video",
+        duration: "15 min",
+        content: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Demo video - replace with actual
+        description: "Introduction to web development and what you'll learn in this course."
+      },
+      {
+        id: 2,
+        title: "HTML Basics: Structure Your Content",
+        type: "video",
+        duration: "20 min",
+        content: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        description: "Learn HTML tags, elements, and how to structure a webpage."
+      },
+      {
+        id: 3,
+        title: "HTML Practice: Build a Simple Page",
+        type: "reading",
+        duration: "30 min",
+        content: "Practice building your first HTML page with hands-on exercises.",
+        readingMaterial: "Complete HTML5 Reference Guide - Chapter 1-3"
+      },
+      {
+        id: 4,
+        title: "CSS Basics: Make It Beautiful",
+        type: "video",
+        duration: "25 min",
+        content: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        description: "Introduction to CSS, selectors, and styling your HTML."
+      },
+      {
+        id: 5,
+        title: "CSS Layouts and Flexbox",
+        type: "video",
+        duration: "30 min",
+        content: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        description: "Learn modern CSS layout techniques with Flexbox."
+      },
+      {
+        id: 6,
+        title: "JavaScript: Adding Interactivity",
+        type: "video",
+        duration: "35 min",
+        content: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        description: "Introduction to JavaScript and making your pages interactive."
+      },
+      {
+        id: 7,
+        title: "JavaScript Practice: Interactive Elements",
+        type: "reading",
+        duration: "45 min",
+        content: "Practice JavaScript with interactive exercises and mini-projects.",
+        readingMaterial: "JavaScript Basics Workbook - Exercises 1-10"
+      },
+      {
+        id: 8,
+        title: "Build Your First Website: Portfolio Project",
+        type: "project",
+        duration: "2 hours",
+        content: "Combine everything you've learned to build a personal portfolio website.",
+        readingMaterial: "Project Guide: Building Your Portfolio Website"
+      }
+    ]
+  },
+  {
     id: 1,
     title: "Complete Web Development Bootcamp",
     description: "Master web development from scratch with HTML, CSS, JavaScript, React, and Node.js",

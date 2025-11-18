@@ -140,6 +140,50 @@ const About = () => {
         </div>
       </section>
 
+      {/* Why Choose Us Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-glow">Why Choose LearnHub?</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              We're committed to providing the best learning experience possible
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: Users,
+                title: "Expert Instructors",
+                description: "Learn from industry professionals with years of real-world experience"
+              },
+              {
+                icon: Target,
+                title: "Practical Learning",
+                description: "Hands-on projects and real-world applications in every course"
+              },
+              {
+                icon: Eye,
+                title: "Flexible Schedule",
+                description: "Learn at your own pace, anytime, anywhere with lifetime access"
+              },
+              {
+                icon: Heart,
+                title: "Community Support",
+                description: "Join a vibrant community of learners and get help when you need it"
+              }
+            ].map((feature, index) => (
+              <Card key={index} className="glass neon-border hover:glow transition-all duration-500 animate-fade-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                <CardContent className="pt-6 text-center">
+                  <feature.icon className="h-12 w-12 text-primary mx-auto mb-4 glow" />
+                  <h3 className="text-lg font-bold mb-2 text-glow">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20" />
@@ -160,6 +204,44 @@ const About = () => {
             <div className="animate-fade-up-delay-3">
               <div className="text-5xl font-bold mb-2 text-glow">95%</div>
               <div className="text-foreground/80">Satisfaction</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-glow">Our Core Values</h2>
+            </div>
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Excellence",
+                  description: "We strive for excellence in everything we do, from course content to student support. Our commitment to quality ensures you receive the best education possible."
+                },
+                {
+                  title: "Accessibility",
+                  description: "Education should be accessible to everyone. We break down barriers and make learning possible for people from all walks of life, regardless of location or background."
+                },
+                {
+                  title: "Innovation",
+                  description: "We continuously innovate our platform and teaching methods to stay at the forefront of online education, incorporating the latest technologies and pedagogical approaches."
+                },
+                {
+                  title: "Community",
+                  description: "Learning is better together. We foster a supportive community where students can connect, collaborate, and grow together on their educational journey."
+                }
+              ].map((value, index) => (
+                <Card key={index} className="glass neon-border hover:glow transition-all duration-500">
+                  <CardContent className="pt-6">
+                    <h3 className="text-xl font-bold mb-3 text-glow">{value.title}</h3>
+                    <p className="text-muted-foreground">{value.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </div>
