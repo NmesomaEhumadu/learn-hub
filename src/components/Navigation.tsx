@@ -2,8 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, BookOpen } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
+  const { user } = useAuth();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -33,16 +35,14 @@ const Navigation = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(link.path) ? "text-primary" : "text-foreground/80"
-                }`}
+                className={`text-sm font-medium transition-colors hover:text-primary ${isActive(link.path) ? "text-primary" : "text-foreground/80"
+                  }`}
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <Link to="/login">
               <Button variant="ghost" className="hover:glow transition-all duration-300">Login</Button>
@@ -70,9 +70,8 @@ const Navigation = () => {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(link.path) ? "text-primary" : "text-foreground/80"
-                  }`}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${isActive(link.path) ? "text-primary" : "text-foreground/80"
+                    }`}
                 >
                   {link.label}
                 </Link>

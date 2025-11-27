@@ -15,12 +15,12 @@ const Courses = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("popular");
-  
+
   // Get max price for slider
-  const maxPrice = useMemo(() => Math.max(...courses.map(c => c.price)), []);
+  const maxPrice = useMemo(() => courses.length > 0 ? Math.max(...courses.map(c => c.price)) : 100, []);
 
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
   const [minRating, setMinRating] = useState(0);
   const [durationFilter, setDurationFilter] = useState("all");
 
@@ -46,12 +46,12 @@ const Courses = () => {
   const filteredCourses = courses
     .filter(course => {
       const matchesCategory = selectedCategory === "All" || course.category === selectedCategory;
-      const matchesSearch = searchQuery === "" || 
+      const matchesSearch = searchQuery === "" ||
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         course.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPrice = course.price >= priceRange[0] && course.price <= priceRange[1];
       const matchesRating = course.rating >= minRating;
-      
+
       let matchesDuration = true;
       if (durationFilter !== "all") {
         const hours = parseDuration(course.duration);
@@ -62,7 +62,7 @@ const Courses = () => {
       return matchesCategory && matchesSearch && matchesPrice && matchesRating && matchesDuration;
     })
     .sort((a, b) => {
-      switch(sortBy) {
+      switch (sortBy) {
         case "price-low":
           return a.price - b.price;
         case "price-high":
@@ -92,7 +92,7 @@ const Courses = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
-      
+
       {/* Header */}
       <section className="relative bg-background py-16 overflow-hidden">
         <div className="absolute inset-0">

@@ -19,11 +19,14 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Clock, Users, Star, CheckCircle, BookOpen, Award, CreditCard, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CourseDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, enrollCourse } = useAuth();
   const course = courses.find(c => c.id === Number(id));
+  const isEnrolled = user?.enrolledCourses?.some(c => c.id === Number(id));
   const [enrollmentStep, setEnrollmentStep] = useState<"info" | "payment" | "success">("info");
   const [showEnrollmentDialog, setShowEnrollmentDialog] = useState(false);
   const [paymentData, setPaymentData] = useState({
@@ -52,6 +55,9 @@ const CourseDetails = () => {
     }
     // Simulate payment processing
     setTimeout(() => {
+      if (course) {
+        enrollCourse(course.id);
+      }
       setEnrollmentStep("success");
       toast.success("Payment processed successfully!");
     }, 1500);
@@ -87,7 +93,7 @@ const CourseDetails = () => {
 
       {/* Hero Section */}
       <section className="relative bg-background py-16 overflow-hidden">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-float" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]" />
         </div>
@@ -97,7 +103,7 @@ const CourseDetails = () => {
               <Badge variant="secondary" className="mb-4 glow">{course.category}</Badge>
               <h1 className="text-4xl md:text-5xl font-bold mb-4 text-glow">{course.title}</h1>
               <p className="text-xl mb-6 text-foreground/80">{course.fullDescription}</p>
-              
+
               <div className="flex flex-wrap gap-6 mb-6">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5 fill-current" />
@@ -114,7 +120,7 @@ const CourseDetails = () => {
               </div>
 
               <div className="flex items-center gap-4 animate-fade-up-delay-1">
-                <img 
+                <img
                   src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${course.instructor}`}
                   alt={course.instructor}
                   className="h-12 w-12 rounded-full glow"
@@ -135,27 +141,38 @@ const CourseDetails = () => {
                   {course.isFree ? "FREE" : `$${course.price}`}
                 </div>
                 {course.isFree ? (
-                  <Link to={`/learn/${course.id}`}>
-                    <Button 
-                      size="lg" 
-                      className="w-full mb-3 glow hover:glow-strong transition-all duration-300"
-                    >
-                      Start Learning Free
-                    </Button>
-                  </Link>
+                  <Button
+                    size="lg"
+                    className="w-full mb-3 glow hover:glow-strong transition-all duration-300"
+                    onClick={() => {
+                      if (user && !isEnrolled) {
+                        enrollCourse(course.id);
+                        toast.success("Enrolled in free course!");
+                      }
+                      navigate(`/learn/${course.id}`);
+                    }}
+                  >
+                    Start Learning Free
+                  </Button>
                 ) : (
                   <>
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="w-full mb-3 glow hover:glow-strong transition-all duration-300"
-                      onClick={handleEnrollClick}
+                      onClick={() => {
+                        if (isEnrolled) {
+                          navigate(`/learn/${course.id}`);
+                        } else {
+                          handleEnrollClick();
+                        }
+                      }}
                     >
-                      Enroll Now
+                      {isEnrolled ? "Continue Learning" : "Enroll Now"}
                     </Button>
                     <Button size="lg" variant="outline" className="w-full neon-border hover:glow transition-all duration-300">Add to Wishlist</Button>
                   </>
                 )}
-                
+
                 <div className="mt-6 pt-6 border-t border-border space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Duration</span>
@@ -256,7 +273,7 @@ const CourseDetails = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-3 mb-4">
-                    <img 
+                    <img
                       src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${course.instructor}`}
                       alt={course.instructor}
                       className="h-16 w-16 rounded-full"
@@ -300,7 +317,7 @@ const CourseDetails = () => {
                   Review your course details and proceed to payment
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="space-y-4 py-4">
                 <Card className="bg-muted/50">
                   <CardContent className="pt-6">
@@ -336,24 +353,12 @@ const CourseDetails = () => {
                     <CheckCircle className="h-4 w-4 text-primary" />
                     <span>30-day money-back guarantee</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Access to course community</span>
-                  </div>
                 </div>
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setShowEnrollmentDialog(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={() => setEnrollmentStep("payment")}
-                  className="glow hover:glow-strong"
-                >
-                  Continue to Payment
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Button variant="outline" onClick={() => setShowEnrollmentDialog(false)}>Cancel</Button>
+                <Button onClick={() => setEnrollmentStep("payment")} className="glow">Proceed to Payment</Button>
               </DialogFooter>
             </>
           )}
@@ -361,24 +366,16 @@ const CourseDetails = () => {
           {enrollmentStep === "payment" && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-glow">Payment Information</DialogTitle>
+                <DialogTitle className="text-glow flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Secure Payment
+                </DialogTitle>
                 <DialogDescription>
-                  Secure payment powered by industry-leading encryption
+                  Your payment information is secure and encrypted
                 </DialogDescription>
               </DialogHeader>
-              
-              <form onSubmit={handlePaymentSubmit} className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cardName">Cardholder Name</Label>
-                  <Input
-                    id="cardName"
-                    placeholder="John Doe"
-                    value={paymentData.cardName}
-                    onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
-                    required
-                  />
-                </div>
 
+              <form onSubmit={handlePaymentSubmit} className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="cardNumber">Card Number</Label>
                   <div className="relative">
@@ -389,8 +386,6 @@ const CourseDetails = () => {
                       value={paymentData.cardNumber}
                       onChange={(e) => setPaymentData({ ...paymentData, cardNumber: e.target.value })}
                       className="pl-10"
-                      maxLength={19}
-                      required
                     />
                   </div>
                 </div>
@@ -403,69 +398,43 @@ const CourseDetails = () => {
                       placeholder="MM/YY"
                       value={paymentData.expiryDate}
                       onChange={(e) => setPaymentData({ ...paymentData, expiryDate: e.target.value })}
-                      maxLength={5}
-                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cvv">CVV</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="cvv"
-                        placeholder="123"
-                        type="password"
-                        value={paymentData.cvv}
-                        onChange={(e) => setPaymentData({ ...paymentData, cvv: e.target.value })}
-                        className="pl-10"
-                        maxLength={4}
-                        required
-                      />
-                    </div>
+                    <Input
+                      id="cvv"
+                      placeholder="123"
+                      value={paymentData.cvv}
+                      onChange={(e) => setPaymentData({ ...paymentData, cvv: e.target.value })}
+                    />
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-2 pt-2">
-                  <Checkbox
-                    id="paymentTerms"
-                    checked={paymentData.agreeToTerms}
-                    onCheckedChange={(checked) =>
-                      setPaymentData({ ...paymentData, agreeToTerms: checked as boolean })
-                    }
+                <div className="space-y-2">
+                  <Label htmlFor="cardName">Cardholder Name</Label>
+                  <Input
+                    id="cardName"
+                    placeholder="John Doe"
+                    value={paymentData.cardName}
+                    onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
                   />
-                  <label
-                    htmlFor="paymentTerms"
-                    className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    I agree to the payment terms and conditions
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={paymentData.agreeToTerms}
+                    onCheckedChange={(checked) => setPaymentData({ ...paymentData, agreeToTerms: checked as boolean })}
+                  />
+                  <label htmlFor="terms" className="text-sm">
+                    I agree to the terms and conditions
                   </label>
                 </div>
 
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">Subtotal</span>
-                    <span className="font-semibold">${course.price}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="font-semibold">Total</span>
-                    <span className="text-xl font-bold text-primary text-glow">${course.price}</span>
-                  </div>
-                </div>
-
                 <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setEnrollmentStep("info")}
-                  >
-                    Back
-                  </Button>
-                  <Button 
-                    type="submit"
-                    className="glow hover:glow-strong"
-                  >
-                    Complete Enrollment
-                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setEnrollmentStep("info")}>Back</Button>
+                  <Button type="submit" className="glow">Complete Payment</Button>
                 </DialogFooter>
               </form>
             </>
@@ -474,29 +443,32 @@ const CourseDetails = () => {
           {enrollmentStep === "success" && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-glow">Enrollment Successful!</DialogTitle>
+                <DialogTitle className="text-glow flex items-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-500" />
+                  Enrollment Successful!
+                </DialogTitle>
                 <DialogDescription>
-                  You're all set! Start learning right away.
+                  Welcome to {course.title}
                 </DialogDescription>
               </DialogHeader>
-              
+
               <div className="py-6 text-center">
-                <div className="mx-auto w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
-                  <CheckCircle className="h-10 w-10 text-primary" />
+                <div className="h-20 w-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-10 w-10 text-green-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Welcome to {course.title}!</h3>
+                <h3 className="text-xl font-bold mb-2">You're all set!</h3>
                 <p className="text-muted-foreground mb-6">
-                  You now have lifetime access to all course materials. Start your learning journey today!
+                  You can now access all course materials and start learning.
                 </p>
-                
-                <div className="space-y-2 mb-6 text-left bg-muted/50 p-4 rounded-lg">
+
+                <div className="space-y-2 text-left bg-muted/30 p-4 rounded-lg">
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Course materials unlocked</span>
+                    <span>Course added to your dashboard</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>Access to course community</span>
+                    <span>Confirmation email sent</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4 text-primary" />
@@ -506,7 +478,7 @@ const CourseDetails = () => {
               </div>
 
               <DialogFooter>
-                <Button 
+                <Button
                   onClick={handleEnrollmentComplete}
                   className="w-full glow hover:glow-strong"
                 >

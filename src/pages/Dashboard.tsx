@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,9 +19,11 @@ import {
 import { BookOpen, Award, Clock, TrendingUp, Settings, LogOut, Edit } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { courses } from "@/data/courses";
 
 const Dashboard = () => {
-  const { user, logout, updateProfile } = useAuth();
+  const { user, logout, updateProfile, isTeacher, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
@@ -29,35 +31,26 @@ const Dashboard = () => {
     avatar: user?.avatar || "",
   });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const enrolledCourses = [
-    {
-      id: 1,
-      title: "Complete Web Development Bootcamp",
-      progress: 65,
-      category: "Web Development",
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&q=80"
-    },
-    {
-      id: 2,
-      title: "Python for Data Science",
-      progress: 40,
-      category: "Data Science",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80"
-    },
-    {
-      id: 3,
-      title: "UX/UI Design Essentials",
-      progress: 80,
-      category: "Design",
-      image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=400&q=80"
+
+  // Redirect teachers and admins to their dashboards
+  useEffect(() => {
+    if (isTeacher) {
+      navigate("/teacher-dashboard");
+    } else if (isAdmin) {
+      navigate("/admin");
     }
-  ];
+  }, [isTeacher, isAdmin, navigate]);
+
+  // Calculate real stats from user data
+  const enrolledCoursesCount = user?.enrolledCourses?.length || 0;
+  const totalLessonsCompleted = user?.enrolledCourses?.reduce((acc, course) =>
+    acc + (course.completedLessons?.length || 0), 0) || 0;
 
   const stats = [
-    { icon: BookOpen, label: "Courses Enrolled", value: "3" },
-    { icon: Clock, label: "Hours Learned", value: "127" },
-    { icon: Award, label: "Certificates", value: "2" },
-    { icon: TrendingUp, label: "Completion Rate", value: "68%" }
+    { icon: BookOpen, label: "Courses Enrolled", value: enrolledCoursesCount.toString() },
+    { icon: Clock, label: "Lessons Completed", value: totalLessonsCompleted.toString() },
+    { icon: Award, label: "Certificates", value: "0" },
+    { icon: TrendingUp, label: "Completion Rate", value: enrolledCoursesCount > 0 ? "In Progress" : "0%" }
   ];
 
   return (
@@ -66,7 +59,7 @@ const Dashboard = () => {
 
       {/* Header */}
       <section className="relative bg-background py-16 overflow-hidden">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-float" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]" />
         </div>
@@ -77,9 +70,11 @@ const Dashboard = () => {
               <p className="text-foreground/80">Continue your learning journey</p>
             </div>
             <div className="flex gap-2 animate-fade-up-delay-1">
-              <Button variant="secondary" size="icon">
-                <Settings className="h-5 w-5" />
-              </Button>
+              <Link to="/settings">
+                <Button variant="secondary" size="icon">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </Link>
               <Button variant="secondary" size="icon" onClick={logout}>
                 <LogOut className="h-5 w-5" />
               </Button>
@@ -118,29 +113,58 @@ const Dashboard = () => {
                 </Link>
               </div>
 
-              {enrolledCourses.map((course) => (
-                <Card key={course.id} className="glass neon-border hover:glow transition-all duration-500 animate-fade-up">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="md:w-48 aspect-video overflow-hidden rounded-t-lg md:rounded-l-lg md:rounded-tr-none">
-                      <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 p-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant="secondary">{course.category}</Badge>
-                        <span className="text-sm font-medium text-primary">{course.progress}% Complete</span>
+              {user?.enrolledCourses && user.enrolledCourses.length > 0 ? (
+                user.enrolledCourses.map((enrolledCourse) => {
+                  const courseDetails = courses.find(c => c.id === enrolledCourse.id);
+                  if (!courseDetails) return null;
+
+                  // Calculate progress based on completed lessons vs total lessons
+                  const totalLessons = courseDetails.lessons?.length || 0;
+                  const completedCount = enrolledCourse.completedLessons?.length || 0;
+                  const progress = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+                  return (
+                    <Card key={enrolledCourse.id} className="glass neon-border hover:glow transition-all duration-500 animate-fade-up">
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="md:w-48 aspect-video overflow-hidden rounded-t-lg md:rounded-l-lg md:rounded-tr-none">
+                          <img src={courseDetails.image} alt={courseDetails.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 p-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <Badge variant="secondary">{courseDetails.category}</Badge>
+                            <span className="text-sm font-medium text-primary">{progress}% Complete</span>
+                          </div>
+                          <h3 className="text-xl font-bold mb-3">{courseDetails.title}</h3>
+                          <Progress value={progress} className="mb-4" />
+                          <div className="flex gap-2">
+                            <Link to={`/learn/${courseDetails.id}`}>
+                              <Button>Continue Learning</Button>
+                            </Link>
+                            <Link to={`/courses/${courseDetails.id}`}>
+                              <Button variant="outline">View Details</Button>
+                            </Link>
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-xl font-bold mb-3">{course.title}</h3>
-                      <Progress value={course.progress} className="mb-4" />
-                      <div className="flex gap-2">
-                        <Link to={`/courses/${course.id}`}>
-                          <Button>Continue Learning</Button>
-                        </Link>
-                        <Button variant="outline">View Details</Button>
-                      </div>
+                    </Card>
+                  );
+                })
+              ) : (
+                <Card className="glass neon-border p-8 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
+                      <BookOpen className="h-8 w-8 text-primary" />
                     </div>
+                    <h3 className="text-xl font-bold">No Courses Yet</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      You haven't enrolled in any courses yet. Browse our catalog to start learning!
+                    </p>
+                    <Link to="/courses">
+                      <Button size="lg" className="glow">Browse Courses</Button>
+                    </Link>
                   </div>
                 </Card>
-              ))}
+              )}
             </div>
 
             {/* Right Column - Profile & Achievements */}
@@ -162,8 +186,8 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground">{user?.email || "user@example.com"}</p>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => {
                       setProfileData({

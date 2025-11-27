@@ -19,9 +19,20 @@ const Login = () => {
     e.preventDefault();
     const success = await login(loginData.email, loginData.password);
     if (success) {
-      const isAdmin = loginData.email.toLowerCase() === "admin@learnhub.com" || loginData.email.toLowerCase() === "admin";
-      toast.success(isAdmin ? "Admin login successful!" : "Login successful!");
-      navigate(isAdmin ? "/admin" : "/dashboard");
+      const emailLower = loginData.email.toLowerCase();
+      const isAdmin = emailLower === "admin@learnhub.com" || emailLower === "admin";
+      const isTeacher = emailLower === "teacher@learnhub.com";
+
+      if (isAdmin) {
+        toast.success("Admin login successful!");
+        navigate("/admin");
+      } else if (isTeacher) {
+        toast.success("Teacher login successful!");
+        navigate("/teacher-dashboard");
+      } else {
+        toast.success("Login successful!");
+        navigate("/dashboard");
+      }
     } else {
       toast.error("Invalid credentials");
     }
@@ -44,8 +55,8 @@ const Login = () => {
     <div className="min-h-screen flex flex-col bg-muted/30">
       <Navigation />
 
-      <div className="flex-1 flex items-center justify-center py-12 px-4 relative overflow-hidden">
-        <div className="absolute inset-0">
+      <div className="flex-1 flex items-center justify-center py-12 px-4 relative">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] animate-float" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px]" />
         </div>
