@@ -17,6 +17,7 @@ const Navigation = () => {
     { path: "/about", label: "About" },
     { path: "/blog", label: "Blog" },
     { path: "/contact", label: "Contact" },
+    { path: "/one-on-one", label: "1-on-1 Mentorship" },
   ];
 
   return (

@@ -141,25 +141,25 @@ const CoursePlayer = () => {
         </div>
       </section>
 
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col lg:flex-row">
         {/* Main Content */}
-        <div className="flex-1">
+        <div className="flex-1 order-2 lg:order-1">
           <div className="container mx-auto px-4 py-6">
             <Card className="glass neon-border">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       {lesson.type === "video" && <Video className="h-5 w-5 text-primary" />}
                       {lesson.type === "reading" && <BookOpen className="h-5 w-5 text-primary" />}
                       {lesson.type === "project" && <FileText className="h-5 w-5 text-primary" />}
                       <Badge variant="secondary">{lesson.type}</Badge>
                       <span className="text-sm text-muted-foreground">{lesson.duration}</span>
                     </div>
-                    <CardTitle className="text-2xl text-glow">{lesson.title}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl text-glow">{lesson.title}</CardTitle>
                   </div>
                   {completedLessons.includes(lesson.id) && (
-                    <Badge className="bg-green-500">
+                    <Badge className="bg-green-500 w-fit">
                       <CheckCircle className="h-4 w-4 mr-1" />
                       Completed
                     </Badge>
@@ -168,7 +168,7 @@ const CoursePlayer = () => {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="lesson" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 h-auto gap-2">
                     <TabsTrigger value="lesson">
                       <Play className="h-4 w-4 mr-2" />
                       Lesson
@@ -243,7 +243,7 @@ const CoursePlayer = () => {
                       </div>
                     )}
 
-                    <div className="flex gap-3 pt-4 border-t border-border">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
                       <Button
                         variant="outline"
                         onClick={handlePrevLesson}
@@ -434,7 +434,7 @@ const CoursePlayer = () => {
         </div>
 
         {/* Sidebar - Lesson List */}
-        <div className="w-80 bg-background border-l border-border p-6 overflow-y-auto">
+        <div className="w-full lg:w-80 bg-background border-t lg:border-t-0 lg:border-l border-border p-6 overflow-y-auto order-1 lg:order-2 max-h-[300px] lg:max-h-none">
           <h3 className="font-bold text-lg mb-4 text-glow">Course Content</h3>
           <div className="space-y-2">
             {course.lessons.map((l, index) => (
